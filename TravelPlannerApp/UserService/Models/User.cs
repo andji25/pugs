@@ -1,4 +1,6 @@
-﻿namespace UserService.Models
+﻿using UserService.Enums;
+
+namespace UserService.Models
 {
     public class User
     {
@@ -6,7 +8,7 @@
         public string Name { get; set; }
         public string Email { get; set; }
         public string PasswordHash { get; set; }
-        public string Role { get; set; } = "user";
+        public UserRole Role { get; set; } = UserRole.User;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
