@@ -40,6 +40,18 @@ namespace TripService.Data
                 .WithOne(c => c.Trip)
                 .HasForeignKey(c => c.TripId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Trip>()
+                .Property(t => t.Budget)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Activity>()
+                .Property(a => a.EstimatedCost)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Expense>()
+                .Property(e => e.Amount)
+                .HasPrecision(18, 2);
         }
     }
 }
