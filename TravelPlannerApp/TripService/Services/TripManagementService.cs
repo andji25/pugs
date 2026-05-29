@@ -6,11 +6,11 @@ using TripService.Models;
 
 namespace TripService.Services
 {
-    public class TripService
+    public class TripManagementService
     {
         private readonly AppDbContext _context;
 
-        public TripService(AppDbContext context)
+        public TripManagementService(AppDbContext context)
         {
             _context = context;
         }

@@ -14,7 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<TripService.Services.TripService>();
+builder.Services.AddScoped<TripManagementService>();
 builder.Services.AddScoped<DestinationService>();
 builder.Services.AddScoped<ActivityService>();
 builder.Services.AddScoped<ExpenseService>();
