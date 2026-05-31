@@ -5,6 +5,7 @@ import TripsPage from './pages/TripsPage'
 import TripDetailPage from './pages/TripDetailPage'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import TripFormPage from './pages/TripFormPage'
 
 function App() {
     return (
@@ -26,6 +27,16 @@ function App() {
                     <Route path="/trips/:id" element={
                         <ProtectedRoute>
                             <TripDetailPage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/trips/new" element={
+                        <ProtectedRoute>
+                            <TripFormPage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/trips/:id/edit" element={
+                        <ProtectedRoute>
+                            <TripFormPage />
                         </ProtectedRoute>
                     } />
                 </Routes>

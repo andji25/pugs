@@ -1,7 +1,68 @@
+import { useState, useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { tripService } from "../services/tripService"
+import DestinationTab from '../components/DestinationsTab'
+
 function TripDetailPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [trip, setTrip] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [activeTab, setActiveTab] = useState('destinations')
+  
+  useEffect(() => {
+    const fetchTrip = async () => {
+      try {
+        const data = await tripService.getById()
+        setTrip(data)
+      } catch (err) {
+        setError('Failed to load trip')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchTrip()
+  }, [id])
+
+  const handleDelete = async () => {
+    if(!window.confirm('Are you sure you want to delete this trip?')) return
+    try {
+      await tripService.delete(id)
+      navigate('/trips')
+    } catch (err) {
+      setError('Failed to delete trip')
+    }
+  }
+
+  if (loading) return <p>Loading...</p>
+  if(error) return <p style={{ color: 'red'}}>{error}</p>
+  if(!trip) return null
+  
   return (
     <div>
-      <h1>Trip details</h1>
+      <button onClick={() => navigate('/trips')}>← Back</button>
+      <h1>{trip.name}</h1>
+      <p>{trip.description}</p>
+      <p>{new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}</p>
+      <p>Budget: {trip.budget}€ | Spent: {trip.totalExpenses}€ | Remaining: {trip.remainingBudget}€</p>
+      <button onClick={() => navigate('/trips/${id}/edit')}>Edit</button>
+      <button onClick={handleDelete}>Delete</button>
+
+      <div>
+        <button onClick={() => setActiveTab('destinations')}>Destinations</button>
+        <button onClick={() => setActiveTab('activities')}>Activities</button>
+        <button onClick={() => setActiveTab('expenses')}>Expenses</button>
+        <button onClick={() => setActiveTab('checklist')}>Checklist</button>
+      </div>
+
+      <div>
+        {activeTab === 'destinations' && <DestinationTab tripId={id} />}
+        {activeTab === 'activities' && <p>Activities tab</p>}
+        {activeTab === 'expenses' && <p>Expenses tab</p>}
+        {activeTab === 'checklist' && <p>Checklist tab</p>}
+      </div>
+
     </div>
   )
 }
