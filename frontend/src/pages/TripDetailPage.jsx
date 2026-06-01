@@ -2,6 +2,9 @@ import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { tripService } from "../services/tripService"
 import DestinationTab from '../components/DestinationsTab'
+import ActivitiesTab from '../components/ActivitiesTab'
+import ExpensesTab from '../components/ExpensesTab'
+import ChecklistTab from '../components/ChecklistTab'
 
 function TripDetailPage() {
   const { id } = useParams()
@@ -58,9 +61,9 @@ function TripDetailPage() {
 
       <div>
         {activeTab === 'destinations' && <DestinationTab tripId={id} />}
-        {activeTab === 'activities' && <p>Activities tab</p>}
-        {activeTab === 'expenses' && <p>Expenses tab</p>}
-        {activeTab === 'checklist' && <p>Checklist tab</p>}
+        {activeTab === 'activities' && <ActivitiesTab tripId={id} />}
+        {activeTab === 'expenses' && <ExpensesTab tripId={id} budget={trip.budget} />}
+        {activeTab === 'checklist' && <ChecklistTab tripId={id} />}
       </div>
 
     </div>
