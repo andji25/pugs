@@ -6,11 +6,13 @@ import TripDetailPage from './pages/TripDetailPage'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import TripFormPage from './pages/TripFormPage'
+import Navbar from './components/Navbar'
 
 function App() {
     return (
         <AuthProvider>
             <BrowserRouter>
+                <Navbar />
                 <Routes>
                     <Route path="/" element={
                         <ProtectedRoute>
