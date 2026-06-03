@@ -30,8 +30,8 @@ namespace TripService.Services
                     Notes = t.Notes,
                     UserId = t.UserId,
                     CreatedAt = t.CreatedAt,
-                    TotalExpenses = t.Expenses.Sum(e => e.Amount),
-                    RemainingBudget = t.Budget - t.Expenses.Sum(e => e.Amount)
+                    TotalExpenses = t.Expenses.Sum(e => e.Amount) + t.Activities.Sum(a => a.EstimatedCost),
+                    RemainingBudget = t.Budget - t.Expenses.Sum(e => e.Amount) - t.Activities.Sum(a => a.EstimatedCost)
                 })
                 .ToListAsync();
         }
@@ -40,6 +40,7 @@ namespace TripService.Services
         {
             var trip = await _context.Trips
                 .Include(t => t.Expenses)
+                .Include(t => t.Activities)
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
             if (trip == null)
@@ -56,8 +57,8 @@ namespace TripService.Services
                 Notes = trip.Notes,
                 UserId = trip.UserId,
                 CreatedAt = trip.CreatedAt,
-                TotalExpenses = trip.Expenses.Sum(e => e.Amount),
-                RemainingBudget = trip.Budget - trip.Expenses.Sum(e => e.Amount)
+                TotalExpenses = trip.Expenses.Sum(e => e.Amount) + trip.Activities.Sum(a => a.EstimatedCost),
+                RemainingBudget = trip.Budget - trip.Expenses.Sum(e => e.Amount) - trip.Activities.Sum(a => a.EstimatedCost)
             };
         }
 
@@ -103,6 +104,7 @@ namespace TripService.Services
         {
             var trip = await _context.Trips
                 .Include(t => t.Expenses)
+                .Include(t => t.Activities)
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
 
             if (trip == null)
@@ -134,8 +136,8 @@ namespace TripService.Services
                 Notes = trip.Notes,
                 UserId = trip.UserId,
                 CreatedAt = trip.CreatedAt,
-                TotalExpenses = trip.Expenses.Sum(e => e.Amount),
-                RemainingBudget = trip.Budget - trip.Expenses.Sum(e => e.Amount)
+                TotalExpenses = trip.Expenses.Sum(e => e.Amount) + trip.Activities.Sum(a => a.EstimatedCost),
+                RemainingBudget = trip.Budget - trip.Expenses.Sum(e => e.Amount) - trip.Activities.Sum(a => a.EstimatedCost)
             };
         }
 

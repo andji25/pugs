@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react"
 import { activityService } from '../services/activityService'
+import CalendarView from './CalendarView'
 
 const STATUS_OPTIONS = ['Planned', 'Reserved', 'Completed', 'Cancelled']
 const STATUS_MAP = { 'Planned': 0, 'Reserved': 1, 'Completed': 2, 'Cancelled': 3 }
 
-function ActivitiesTAb({ tripId }) {
+function ActivitiesTab({ tripId }) {
     const [activities, setActivities] = useState([])
     const [loading, setLoading] = useState(true)
     const [showForm, setShowForm] = useState(false)
     const [editingId, setEditingId] = useState(null)
     const [errors, setErrors] = useState({})
+    const [showCalendar, setShowCalendar] = useState(false)
     const [form, setForm] = useState({
         name: '',
         date: '',
@@ -127,6 +129,9 @@ function ActivitiesTAb({ tripId }) {
     return (
         <div>
             <button onClick={() => setShowForm(!showForm)}>+ Add Activity</button>
+            <button onClick={() => setShowCalendar(!showCalendar)}>
+                {showCalendar ? 'List View' : 'Calendar View'}
+            </button>
             {showForm && (
                 <form onSubmit={handleSubmit}>
                     <div>
@@ -169,28 +174,32 @@ function ActivitiesTAb({ tripId }) {
                 </form>
             )}
 
-            {activities.length === 0 ? (
-                <p>No activities yet.</p>
+            {showCalendar ? (
+                <CalendarView activities={activities} />
             ) : (
-                activities.map(activity => (
-                    <div key={activity.id}>
-                        <h4>{activity.name}</h4>
-                        <p>{new Date(activity.date).toLocaleDateString()} {activity.time}</p>
-                        <p>{activity.location}</p>
-                        <p>{activity.description}</p>
-                        <p>Estimated cost: {activity.estimatedCost}€</p>
-                        <select 
-                            value={getStatusLabel(activity.status)}
-                            onChange={(e) => handleStatusChange(activity.id, e.target.value)}
-                        >
-                            {STATUS_OPTIONS.map(s => (
-                                <option key={s} value={s}>{s}</option>
-                            ))}
-                        </select>
-                        <button onClick={() => handleEdit(activity)}>Edit</button>
-                        <button onClick={() => handleDelete(activity.id)}>Delete</button>
-                    </div>
-                ))
+                activities.length === 0 ? (
+                    <p>No activities yet.</p>
+                ) : (
+                    activities.map(activity => (
+                        <div key={activity.id}>
+                            <h4>{activity.name}</h4>
+                            <p>{new Date(activity.date).toLocaleDateString()} {activity.time}</p>
+                            <p>{activity.location}</p>
+                            <p>{activity.description}</p>
+                            <p>Estimated cost: {activity.estimatedCost}€</p>
+                            <select 
+                                value={getStatusLabel(activity.status)}
+                                onChange={(e) => handleStatusChange(activity.id, e.target.value)}
+                            >
+                                {STATUS_OPTIONS.map(s => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                            <button onClick={() => handleEdit(activity)}>Edit</button>
+                            <button onClick={() => handleDelete(activity.id)}>Delete</button>
+                        </div>
+                    ))
+                )
             )}
         </div>
     )
