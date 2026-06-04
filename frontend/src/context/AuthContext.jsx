@@ -10,6 +10,7 @@ export function AuthProvider({ children }){
         const user = new User(
             userData.id,
             userData.name,
+            userData.email,
             userData.role,
             userData.token
         )
@@ -30,5 +31,5 @@ export function AuthProvider({ children }){
 }
 
 export function useAuth(){
-    return useContext(AuthProvider)
+    return useContext(AuthContext)
 }

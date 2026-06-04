@@ -33,7 +33,7 @@ function TripsPage() {
         <p>No trips yet. Create your first trip!</p>
       ) : (
         trips.map(trip => (
-          <div key={trip.id} onClick={() => navigate('/trips/${trip.id}')}>
+          <div key={trip.id} onClick={() => navigate(`/trips/${trip.id}`)}>
             <h3>{trip.name}</h3>
             <p>{trip.description}</p>
             <p>{new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}</p>

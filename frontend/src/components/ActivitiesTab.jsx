@@ -205,4 +205,4 @@ function ActivitiesTab({ tripId }) {
     )
 }
 
-export default ActivitiesTAb
+export default ActivitiesTab
