@@ -5,6 +5,7 @@ import TripsPage from './pages/TripsPage'
 import TripDetailPage from './pages/TripDetailPage'
 import TripFormPage from './pages/TripFormPage'
 import AdminPage from './pages/AdminPage'
+import SharedTripPage from './pages/SharedTripPage'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
@@ -47,6 +48,7 @@ function App() {
                             <AdminPage />
                         </ProtectedRoute>
                     } />
+                    <Route path="/shared/:token" element={SharedTripPage} />
                 </Routes>
             </BrowserRouter>
         </AuthProvider>
