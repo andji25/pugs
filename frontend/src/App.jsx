@@ -48,7 +48,7 @@ function App() {
                             <AdminPage />
                         </ProtectedRoute>
                     } />
-                    <Route path="/shared/:token" element={SharedTripPage} />
+                    <Route path="/shared/:token" element={<SharedTripPage />} />
                 </Routes>
             </BrowserRouter>
         </AuthProvider>

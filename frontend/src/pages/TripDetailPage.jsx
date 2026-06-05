@@ -6,6 +6,11 @@ import ActivitiesTab from '../components/ActivitiesTab'
 import ExpensesTab from '../components/ExpensesTab'
 import ChecklistTab from '../components/ChecklistTab'
 import ShareTripModal from '../components/ShareTripModal'
+import PdfExport from '../components/PdfExport'
+import { destinationService } from "../services/destinationService"
+import { activityService } from "../services/activityService"
+import { expenseService } from "../services/expenseService"
+import { checklistService } from "../services/checklistService"
 
 function TripDetailPage() {
   const { id } = useParams()
@@ -15,12 +20,29 @@ function TripDetailPage() {
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('destinations')
   const [showShareModal, setShowShareModal] = useState(false)
+  const [destinations, setDestinations] =  useState([])
+  const [activities, setActivities] = useState([])
+  const [expenses, setExpenses] = useState([])
+  const [checklist, setChecklist] = useState([])
 
   useEffect(() => {
     const fetchTrip = async () => {
       try {
-        const data = await tripService.getById(id)
-        setTrip(data)
+          const data = await tripService.getById(id)
+          setTrip(data)
+
+          const [dests, acts, exps, checks] = await Promise.all([
+            destinationService.getByTrip(id),
+            activityService.getByTrip(id),
+            expenseService.getByTrip(id),
+            checklistService.getByTrip(id)
+          ])
+
+          setDestinations(dests)
+          setActivities(acts)
+          setExpenses(exps)
+          setChecklist(checks)
+
       } catch (err) {
         setError('Failed to load trip')
       } finally {
@@ -54,6 +76,12 @@ function TripDetailPage() {
       <button onClick={() => navigate(`/trips/${id}/edit`)}>Edit</button>
       <button onClick={handleDelete}>Delete</button>
       <button onClick={() => setShowShareModal(true)}>Share</button>
+      <PdfExport
+        trip={trip}
+        destinations={destinations}
+        activities={activities}
+        expenses={expenses}
+        checklist={checklist} />
 
       <div>
         <button onClick={() => setActiveTab('destinations')}>Destinations</button>

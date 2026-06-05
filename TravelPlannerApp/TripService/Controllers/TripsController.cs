@@ -51,6 +51,21 @@ namespace TripService.Controllers
             }
         }
 
+        [HttpGet("public/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPublic(int id)
+        {
+            try
+            {
+                var trip = await _tripService.GetTripByIdPublic(id);
+                return Ok(trip);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateTripDto dto)
         {

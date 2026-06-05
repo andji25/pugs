@@ -62,6 +62,32 @@ namespace TripService.Services
             };
         }
 
+        public async Task<TripResponseDto> GetTripByIdPublic(int id)
+        {
+            var trip = await _context.Trips
+                .Include(t => t.Expenses)
+                .Include(t => t.Activities)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (trip == null)
+                throw new Exception("Trip not found");
+
+            return new TripResponseDto
+            {
+                Id = trip.Id,
+                Name = trip.Name,
+                Description = trip.Description,
+                StartDate = trip.StartDate,
+                EndDate = trip.EndDate,
+                Budget = trip.Budget,
+                Notes = trip.Notes,
+                UserId = trip.UserId,
+                CreatedAt = trip.CreatedAt,
+                TotalExpenses = trip.Expenses.Sum(e => e.Amount) + trip.Activities.Sum(a => a.EstimatedCost),
+                RemainingBudget = trip.Budget - trip.Expenses.Sum(e => e.Amount) - trip.Activities.Sum(a => a.EstimatedCost)
+            };
+        }
+
         public async Task<TripResponseDto> CreateTrip(CreateTripDto dto, int userId)
         {
             if (dto.EndDate < dto.StartDate)

@@ -22,6 +22,12 @@ const getHeaders = () => ({
         return response.json()
     },
 
+    async getPublic(id) {
+      const response = await fetch(`${API_URL}/api/trips/public/${id}`)
+      if (!response.ok) throw new Error('Failed to fetch trip')
+      return response.json()
+    },
+
     async create(dto) {
         const response = await fetch(`${API_URL}/api/trips`, {
           method: 'POST',

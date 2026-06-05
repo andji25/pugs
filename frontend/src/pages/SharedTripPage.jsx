@@ -15,7 +15,7 @@ function SharedTripPage() {
             try { 
                 const tokenData = await sharingService.validateToken(token)
                 setAccessType(tokenData.accessType)
-                const tripData = await tripService.getById(tokenData.tripId)
+                const tripData = await tripService.getPublic(tokenData.tripId)
                 setTrip(tripData)
             } catch (err) {
                 setError('This link is invalid or has expired.')
