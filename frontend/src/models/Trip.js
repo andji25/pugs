@@ -1,5 +1,5 @@
 export class Trip {
-constructor(id, name, description, startDate, endDate, budget, notes, userId, createdAt, totalExpenses, remainingBudget){
+  constructor(id, name, description, startDate, endDate, budget, notes, userId, createdAt, totalExpenses, remainingBudget) {
     this.id = id
     this.name = name
     this.description = description
@@ -11,6 +11,6 @@ constructor(id, name, description, startDate, endDate, budget, notes, userId, cr
     this.createdAt = createdAt
     this.totalExpenses = totalExpenses
     this.remainingBudget = remainingBudget
-}
+  }
 
 }
