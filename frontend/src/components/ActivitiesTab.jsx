@@ -50,7 +50,7 @@ function ActivitiesTab({ tripId }) {
     return newErrors
   }
 
-  const gropuByDate = (activities) => {
+  const groupByDate = (activities) => {
     return activities.reduce((groups, activity) => {
       const date = activity.date.split('T')[0]
       if (!groups[date]) groups[date] = []
@@ -59,7 +59,7 @@ function ActivitiesTab({ tripId }) {
     }, {})
   }
 
-  const groupedActivities = gropuByDate(activities)
+  const groupedActivities = groupByDate(activities)
   const sortedDates = Object.keys(groupedActivities).sort()
 
   const handleChange = (e) => {

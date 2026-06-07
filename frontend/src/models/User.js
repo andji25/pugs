@@ -8,6 +8,6 @@ export class User {
   }
 
   isAdmin() {
-    return this.role === 'admin'
+    return this.role === 1
   }
 }

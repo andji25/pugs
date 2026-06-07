@@ -1,7 +1,8 @@
 const API_URL = import.meta.env.VITE_USER_SERVICE_URL
+const TRIP_API_URL = import.meta.env.VITE_TRIP_SERVICE_URL
 
 const getHeaders = () => ({
-  'Content-Type': 'application-json',
+  'Content-Type': 'application/json',
   'Authorization': `Bearer ${localStorage.getItem('token')}`
 })
 
@@ -23,7 +24,7 @@ export const adminService = {
   },
 
   async deleteUserTrips(userId) {
-    const response = await fetch(`${import.meta.env.VITE_TRIP_SERVICE_URL}/api/admin/trips/user/${userId}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/trips/user/${userId}`, {
       method: 'DELETE',
       headers: getHeaders()
     })
@@ -31,15 +32,23 @@ export const adminService = {
   },
 
   async getAllTrips() {
-    const response = await fetch(`${API_URL}/api/admin/trips`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/trips`, {
       headers: getHeaders()
     })
     if (!response.ok) throw new Error('Failed to fetch trips')
     return response.json()
   },
 
+  async getTripById(id) {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/trips/${id}`, {
+      headers: getHeaders()
+    })
+    if (!response.ok) throw new Error('Failed to fetch trip')
+    return response.json()
+  },
+
   async updateTrip(id, dto) {
-    const response = await fetch(`${API_URL}/api/admin/trips/${id}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/trips/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(dto)
@@ -49,7 +58,7 @@ export const adminService = {
   },
 
   async deleteTrip(id) {
-    const response = await fetch(`${API_URL}/api/admin/trips/${id}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/trips/${id}`, {
       method: 'DELETE',
       headers: getHeaders()
     })
@@ -57,7 +66,7 @@ export const adminService = {
   },
 
   async getDestinationsByTrip(tripId) {
-    const response = await fetch(`${API_URL}/api/admin/destinations/trip/${tripId}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/destinations/trip/${tripId}`, {
       headers: getHeaders()
     })
     if (!response.ok) throw new Error('Failed to fetch destinations')
@@ -65,7 +74,7 @@ export const adminService = {
   },
 
   async updateDestination(id, dto) {
-    const response = await fetch(`${API_URL}/api/admin/destinations/${id}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/destinations/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(dto)
@@ -75,7 +84,7 @@ export const adminService = {
   },
 
   async deleteDestination(id) {
-    const response = await fetch(`${API_URL}/api/admin/destinations/${id}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/destinations/${id}`, {
       method: 'DELETE',
       headers: getHeaders()
     })
@@ -83,7 +92,7 @@ export const adminService = {
   },
 
   async getActivitiesByTrip(tripId) {
-    const response = await fetch(`${API_URL}/api/admin/activities/trip/${tripId}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/activities/trip/${tripId}`, {
       headers: getHeaders()
     })
     if (!response.ok) throw new Error('Failed to fetch activities')
@@ -91,7 +100,7 @@ export const adminService = {
   },
 
   async updateActivity(id, dto) {
-    const response = await fetch(`${API_URL}/api/admin/activities/${id}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/activities/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
       body: JSON.stringify(dto)
@@ -101,7 +110,7 @@ export const adminService = {
   },
 
   async deleteActivity(id) {
-    const response = await fetch(`${API_URL}/api/admin/activities/${id}`, {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/activities/${id}`, {
       method: 'DELETE',
       headers: getHeaders()
     })
