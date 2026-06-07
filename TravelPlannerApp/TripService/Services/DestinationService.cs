@@ -14,7 +14,7 @@ namespace TripService.Services
             _context = context;
         }
 
-        public async Task<List<DestinationResponseDto>> GetDestinationByTrip(int tripId)
+        public async Task<List<DestinationResponseDto>> GetDestinationsByTrip(int tripId)
         {
             return await _context.Destinations
                 .Where(d => d.TripId == tripId)

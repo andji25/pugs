@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TripService.Data;
 using TripService.DTOs;
 using TripService.Services;
 
@@ -12,13 +10,15 @@ namespace TripService.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-        private readonly AppDbContext _context;
         private readonly TripManagementService _tripService;
-        
-        public AdminController(AppDbContext context, TripManagementService tripService)
+        private readonly DestinationService _destinationService;
+        private readonly ActivityService _activityService;
+
+        public AdminController(TripManagementService tripService, DestinationService destinationService, ActivityService activityService)
         {
-            _context = context;
             _tripService = tripService;
+            _destinationService = destinationService;
+            _activityService = activityService;
         }
 
         [HttpGet("trips")]
@@ -26,25 +26,36 @@ namespace TripService.Controllers
         {
             try
             {
-                var trips = await _context.Trips
-                    .Include(t => t.Expenses)
-                    .Include(t => t.Activities)
-                    .Select(t => new TripResponseDto
-                    {
-                        Id = t.Id,
-                        Name = t.Name,
-                        Description = t.Description,
-                        StartDate = t.StartDate,
-                        EndDate = t.EndDate,
-                        Budget = t.Budget,
-                        Notes = t.Notes,
-                        UserId = t.UserId,
-                        CreatedAt = t.CreatedAt,
-                        TotalExpenses = t.Expenses.Sum(e => e.Amount) + t.Activities.Sum(a => a.EstimatedCost),
-                        RemainingBudget = t.Budget - t.Expenses.Sum(e => e.Amount) - t.Activities.Sum(a => a.EstimatedCost)
-                    })
-                    .ToListAsync();
+                var trips = await _tripService.GetAllTripsAdmin();
                 return Ok(trips);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("trips/{id}")]
+        public async Task<IActionResult> GetTripById(int id)
+        {
+            try
+            {
+                var trip = await _tripService.GetTripByIdAdmin(id);
+                return Ok(trip);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("trips/{id}")]
+        public async Task<IActionResult> UpdateTrip(int id, UpdateTripDto dto)
+        {
+            try
+            {
+                var trip = await _tripService.UpdateTripAdmin(id, dto);
+                return Ok(trip);
             }
             catch (Exception ex)
             {
@@ -57,17 +68,110 @@ namespace TripService.Controllers
         {
             try
             {
-                var trip = await _context.Trips.FindAsync(id);
-                if (trip == null)
-                    return NotFound(new { message = "Trip not found" });
+                await _tripService.DeleteTripAdmin(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
 
-                _context.Trips.Remove(trip);
-                await _context.SaveChangesAsync();
+        [HttpDelete("trips/user/{userId}")]
+        public async Task<IActionResult> DeleteTripsByUser(int userId)
+        {
+            try
+            {
+                await _tripService.DeleteTripsByUserAdmin(userId);
                 return NoContent();
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("destinations/trip/{tripId}")]
+        public async Task<IActionResult> GetDestinationsByTrip(int tripId)
+        {
+            try
+            {
+                var destinations = await _destinationService.GetDestinationsByTrip(tripId);
+                return Ok(destinations);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("destinations/{id}")]
+        public async Task<IActionResult> UpdateDestination(int id, CreateDestinationDto dto)
+        {
+            try
+            {
+                var destination = await _destinationService.UpdateDestination(id, dto);
+                return Ok(destination);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("destinations/{id}")]
+        public async Task<IActionResult> DeleteDestination(int id)
+        {
+            try
+            {
+                await _destinationService.DeleteDestination(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("activities/trip/{tripId}")]
+        public async Task<IActionResult> GetActivitiesByTrip(int tripId)
+        {
+            try
+            {
+                var activities = await _activityService.GetActivitiesByTrip(tripId);
+                return Ok(activities);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("activities/{id}")]
+        public async Task<IActionResult> UpdateActivity(int id, CreateActivityDto dto)
+        {
+            try
+            {
+                var activity = await _activityService.UpdateActivity(id, dto);
+                return Ok(activity);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("activities/{id}")]
+        public async Task<IActionResult> DeleteActivity(int id)
+        {
+            try
+            {
+                await _activityService.DeleteActivity(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
             }
         }
     }

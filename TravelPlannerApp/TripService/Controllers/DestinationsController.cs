@@ -22,7 +22,7 @@ namespace TripService.Controllers
         {
             try
             {
-                var destinations = await _destinationService.GetDestinationByTrip(tripId);
+                var destinations = await _destinationService.GetDestinationsByTrip(tripId);
                 return Ok(destinations);
             }
             catch (Exception ex)

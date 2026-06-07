@@ -177,7 +177,106 @@ namespace TripService.Services
 
             _context.Trips.Remove(trip);
             await _context.SaveChangesAsync();
+        }
 
+        public async Task DeleteTripsByUserAdmin(int userId)
+        {
+            var trips = await _context.Trips
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
+            _context.Trips.RemoveRange(trips);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<TripResponseDto>> GetAllTripsAdmin()
+        {
+            return await _context.Trips
+                .Include(t => t.Expenses)
+                .Include(t => t.Activities)
+                .Select(t => new TripResponseDto
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Description = t.Description,
+                    StartDate = t.StartDate,
+                    EndDate = t.EndDate,
+                    Budget = t.Budget,
+                    Notes = t.Notes,
+                    UserId = t.UserId,
+                    CreatedAt = t.CreatedAt,
+                    TotalExpenses = t.Expenses.Sum(e => e.Amount) + t.Activities.Sum(a => a.EstimatedCost),
+                    RemainingBudget = t.Budget - t.Expenses.Sum(e => e.Amount) - t.Activities.Sum(a => a.EstimatedCost)
+                })
+                .ToListAsync();
+        }
+
+        public async Task<TripResponseDto> GetTripByIdAdmin(int id)
+        {
+            var trip = await _context.Trips
+                .Include(t => t.Expenses)
+                .Include(t => t.Activities)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (trip == null) throw new Exception("Trip not found");
+
+            return new TripResponseDto
+            {
+                Id = trip.Id,
+                Name = trip.Name,
+                Description = trip.Description,
+                StartDate = trip.StartDate,
+                EndDate = trip.EndDate,
+                Budget = trip.Budget,
+                Notes = trip.Notes,
+                UserId = trip.UserId,
+                CreatedAt = trip.CreatedAt,
+                TotalExpenses = trip.Expenses.Sum(e => e.Amount) + trip.Activities.Sum(a => a.EstimatedCost),
+                RemainingBudget = trip.Budget - trip.Expenses.Sum(e => e.Amount) - trip.Activities.Sum(a => a.EstimatedCost)
+            };
+        }
+
+        public async Task<TripResponseDto> UpdateTripAdmin(int id, UpdateTripDto dto)
+        {
+            var trip = await _context.Trips
+                .Include(t => t.Expenses)
+                .Include(t => t.Activities)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (trip == null) throw new Exception("Trip not found");
+            if (dto.EndDate < dto.StartDate) throw new Exception("End date cannot be before start date");
+            if (dto.Budget < 0) throw new Exception("Budget cannot be negative");
+
+            trip.Name = dto.Name;
+            trip.Description = dto.Description;
+            trip.StartDate = dto.StartDate;
+            trip.EndDate = dto.EndDate;
+            trip.Budget = dto.Budget;
+            trip.Notes = dto.Notes;
+
+            await _context.SaveChangesAsync();
+
+            return new TripResponseDto
+            {
+                Id = trip.Id,
+                Name = trip.Name,
+                Description = trip.Description,
+                StartDate = trip.StartDate,
+                EndDate = trip.EndDate,
+                Budget = trip.Budget,
+                Notes = trip.Notes,
+                UserId = trip.UserId,
+                CreatedAt = trip.CreatedAt,
+                TotalExpenses = trip.Expenses.Sum(e => e.Amount) + trip.Activities.Sum(a => a.EstimatedCost),
+                RemainingBudget = trip.Budget - trip.Expenses.Sum(e => e.Amount) - trip.Activities.Sum(a => a.EstimatedCost)
+            };
+        }
+
+        public async Task DeleteTripAdmin(int id)
+        {
+            var trip = await _context.Trips.FindAsync(id);
+            if (trip == null) throw new Exception("Trip not found");
+            _context.Trips.Remove(trip);
+            await _context.SaveChangesAsync();
         }
     }
 }
