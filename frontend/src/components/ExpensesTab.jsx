@@ -2,171 +2,215 @@ import { useState, useEffect } from "react"
 import { expenseService } from "../services/expenseService"
 
 const CATEGORY_OPTIONS = ['Transport', 'Accommodation', 'Food', 'Tickets', 'Shopping', 'Other']
-const CATEGORY_MAP = {'Transport': 0, 'Accommodation': 1, 'Food': 2, 'Tickets': 3, 'Shopping': 4, 'Other': 5}
+const CATEGORY_MAP = { 'Transport': 0, 'Accommodation': 1, 'Food': 2, 'Tickets': 3, 'Shopping': 4, 'Other': 5 }
 
 function ExpensesTab({ tripId, budget }) {
-    const [expenses, setExpenses] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [showForm, setShowForm] = useState(false)
-    const [editingId, setEditingId] = useState(null)
-    const [errors, setErrors] = useState({})
-    const [form, setForm] = useState({
-        name: '',
-        category: 0,
-        amount: '',
-        date: '',
-        description: '',
-        tripId: tripId
+  const [expenses, setExpenses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [errors, setErrors] = useState({})
+  const [form, setForm] = useState({
+    name: '',
+    category: 0,
+    amount: '',
+    date: '',
+    description: '',
+    tripId: tripId
+  })
+
+  useEffect(() => {
+    fetchExpenses()
+  }, [])
+
+  const fetchExpenses = async () => {
+    try {
+      const data = await expenseService.getByTrip(tripId)
+      setExpenses(data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const validate = () => {
+    const newErrors = {}
+    if (!form.name.trim()) {
+      newErrors.name = 'Name is required'
+    } else if (form.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters'
+    }
+    if (!form.date) newErrors.date = 'Date is required'
+    if (!form.amount || form.amount <= 0) newErrors.amount = 'Amount must be greater than zero'
+    return newErrors
+  }
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const validationErrors = validate()
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors)
+      return
+    }
+
+    try {
+      if (editingId) {
+        await expenseService.update(editingId, form)
+      } else {
+        await expenseService.create(form)
+      }
+      await fetchExpenses()
+      resetForm()
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleEdit = (expense) => {
+    setForm({
+      name: expense.name,
+      category: expense.category,
+      amount: expense.amount,
+      date: expense.date.split('T')[0],
+      description: expense.description || '',
+      tripId: tripId
     })
+    setEditingId(expense.id)
+    setShowForm(true)
+  }
 
-    useEffect(() => {
-        fetchExpenses()
-    }, [])
-
-    const fetchExpenses = async () => {
-        try {
-            const data = await expenseService.getByTrip(tripId)
-            setExpenses(data)
-        } catch (err) {
-            console.error(err)
-        } finally {
-            setLoading(false)
-        }
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this expense?')) return
+    try {
+      await expenseService.delete(id)
+      await fetchExpenses()
+    } catch (err) {
+      console.error(err)
     }
+  }
 
-    const validate = () => {
-        const newErrors = {}
-        if(!form.name.trim()) newErrors.name = 'Name is required'
-        if(!form.date) newErrors.date = 'Date is required'
-        if(!form.amount || form.amount <= 0) newErrors.amount = 'Amount must be greater than zero'
-        return newErrors
-    }
+  const resetForm = () => {
+    setForm({
+      name: '',
+      category: 0,
+      amount: '',
+      date: '',
+      description: '',
+      tripId: tripId
+    })
+    setEditingId(null)
+    setShowForm(false)
+    setErrors({})
+  }
 
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value })
-    }
+  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
+  const remainingBudget = budget - totalExpenses
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        const validationErrors = validate()
-        if(Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors)
-            return
-        }
-        
-        try {
-            if(editingId) {
-                await expenseService.update(editingId, form)
-            } else {
-                await expenseService.create(form)
-            }
-            await fetchExpenses()
-            resetForm()
-        } catch (err) {
-            console.error(err)
-        }
-    }
+  const getCategoryLabel = (category) => CATEGORY_OPTIONS[category] || 'Other'
 
-    const handleEdit = (expense) => {
-        setForm({
-            name: expense.name,
-            category: expense.category,
-            amount: expense.amount,
-            date: expense.date.split('T')[0],
-            description: expense.description || '',
-            tripId: tripId
-        })
-        setEditingId(expense.id)
-        setShowForm(true)
-    }
+  if (loading) return <p className="text-center text-teal-700">Loading...</p>
 
-    const handleDelete = async (id) => {
-        if (!window.confirm('Delete this expense?')) return
-        try {
-            await expenseService.delete(id)
-            await fetchExpenses()
-        } catch (err) {
-            console.error(err)
-        }
-    }
-
-    const resetForm = () => {
-        setForm({
-            name: '',
-            category: 0,
-            amount: '',
-            date: '',
-            description: '',
-            tripId: tripId
-        })
-        setEditingId(null)
-        setShowForm(false)
-        setErrors({})
-    }
-
-    const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
-    const remainingBudget = budget - totalExpenses
-    
-    const getCategoryLabel = (category) => CATEGORY_OPTIONS[category] || 'Other'
-
-    if (loading) return <p>Loading...</p>
-
-    return (
-        <div>
-            <p>Total spent: {totalExpenses}€ | Remaining Budget: {remainingBudget}€</p>
-            <button onClick={() => setShowForm(!showForm)}>+ Add Expense</button>
-
-            {showForm && (
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>Name</label>
-                        <input name="name" value={form.name} onChange={handleChange}/>
-                        {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
-                    </div>
-                    <div>
-                        <label>Category</label>
-                        <select name="category" value={form.category} onChange={handleChange}>
-                            {CATEGORY_OPTIONS.map((c, i) => (
-                                <option key={c} value={i}>{c}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label>Amount (€)</label>
-                        <input type="number" name="amount" value={form.amount} onChange={handleChange}/>
-                        {errors.amount && <p style={{ color: 'red' }}>{errors.amount}</p>}
-                    </div>
-                    <div>
-                        <label>Date</label>
-                        <input type="date" name="date" value={form.date} onChange={handleChange}/>
-                        {errors.date && <p style={{ color: 'red' }}>{errors.date}</p>}
-                    </div>
-                    <div>
-                        <label>Description</label>
-                        <textarea name="description" value={form.description} onChange={handleChange}/>
-                    </div>
-                    <button type="submit">{editingId ? 'Update' : 'Add'}</button>
-                    <button type="button" onClick={resetForm}>Cancel</button>
-                </form>
-            )}
-
-            {expenses.length === 0 ? (
-                <p>No expenses yet.</p>
-            ) : (
-                expenses.map(expense => (
-                    <div key={expense.id}>
-                        <h4>{expense.name}</h4>
-                        <p>{getCategoryLabel(expense.category)}</p>
-                        <p>{expense.amount}€</p>
-                        <p>{new Date(expense.date).toLocaleDateString()}</p>
-                        <p>{expense.description}</p>
-                        <button onClick={() => handleEdit(expense)}>Edit</button>
-                        <button onClick={() => handleDelete(expense.id)}>Delete</button>
-                    </div>
-                ))
-            )}
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex gap-4 text-sm">
+          <span className="text-orange-500 font-medium">Total Spent: {totalExpenses}€</span>
+          <span className="text-teal-600 font-medium">Remaining: {remainingBudget}€</span>
         </div>
-    )
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+          + Add Expense
+        </button>
+      </div>
+
+      {showForm && (
+        <form onSubmit={handleSubmit} className="bg-white/80 rounded-xl p-4 mb-4 space-y-3 border border-sky-200">
+          <div>
+            <label className="block text-sm font-medium text-teal-800 mb-1">Name</label>
+            <input name="name" value={form.name} onChange={handleChange}
+              className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none ${errors.name ? 'border-red-400' : 'border-sky-200'}`} />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-teal-800 mb-1">Category</label>
+              <select name="category" value={form.category} onChange={handleChange}
+                className="w-full px-3 py-2 rounded-lg border border-sky-200 bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none">
+                {CATEGORY_OPTIONS.map((c, i) => (
+                  <option key={c} value={i}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-teal-800 mb-1">Amount (€)</label>
+              <input type="number" name="amount" value={form.amount} onChange={handleChange}
+                className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none ${errors.amount ? 'border-red-400' : 'border-sky-200'}`} />
+              {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-teal-800 mb-1">Date</label>
+            <input type="date" name="date" value={form.date} onChange={handleChange}
+              className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none ${errors.date ? 'border-red-400' : 'border-sky-200'}`} />
+            {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-teal-800 mb-1">Description</label>
+            <textarea name="description" value={form.description} onChange={handleChange} rows={2}
+              className="w-full px-3 py-2 rounded-lg border border-sky-200 bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none" />
+          </div>
+          <div className="flex gap-2">
+            <button type="submit"
+              className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-sm transition">
+              {editingId ? 'Update' : 'Add'}
+            </button>
+            <button type="button" onClick={resetForm}
+              className="border border-sky-200 text-teal-700 px-4 py-2 rounded-lg text-sm hover:bg-white/80 transition">
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+
+      {expenses.length === 0 ? (
+        <p className="text-center text-gray-400 py-8">No expenses yet.</p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {expenses.map(expense => (
+            <div key={expense.id} className="bg-white/80 rounded-xl p-4 border border-sky-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-semibold text-teal-900">💰 {expense.name}</h4>
+                  <p className="text-sm text-gray-500">{getCategoryLabel(expense.category)}</p>
+                  <p className="text-sm text-gray-400">{new Date(expense.date).toLocaleDateString()}</p>
+                  {expense.description && <p className="text-sm text-gray-500 mt-1">{expense.description}</p>}
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <span className="text-orange-500 font-semibold">{expense.amount}€</span>
+                  <div className="flex gap-2">
+                    <button onClick={() => handleEdit(expense)}
+                      className="border border-teal-400 text-teal-600 px-3 py-1 rounded-lg text-sm hover:bg-teal-50 transition">
+                      ✏️
+                    </button>
+                    <button onClick={() => handleDelete(expense.id)}
+                      className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default ExpensesTab

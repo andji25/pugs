@@ -12,53 +12,53 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 
 function App() {
-    return (
-        <AuthProvider>
-            <BrowserRouter>
-                <Navbar />
-                <Routes>
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                    <Route path="/" element={
-                        <ProtectedRoute>
-                            <TripsPage />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/trips" element={
-                        <ProtectedRoute>
-                            <TripsPage />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/trips/new" element={
-                        <ProtectedRoute>
-                            <TripFormPage />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/trips/:id/edit" element={
-                        <ProtectedRoute>
-                            <TripFormPage />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/trips/:id" element={
-                        <ProtectedRoute>
-                            <TripDetailPage />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/admin" element={
-                        <ProtectedRoute>
-                            <AdminPage />
-                        </ProtectedRoute>
-                    } />
-                    <Route path="/admin/trips/:id" element={
-                        <ProtectedRoute>
-                            <AdminTripDetailPage />
-                        </ProtectedRoute>
-                    }/>
-                    <Route path="/shared/:token" element={<SharedTripPage />} />
-                </Routes>
-            </BrowserRouter>
-        </AuthProvider>
-    )
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/" element={
+            <ProtectedRoute>
+              <TripsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/trips" element={
+            <ProtectedRoute>
+              <TripsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/trips/new" element={
+            <ProtectedRoute>
+              <TripFormPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/trips/:id/edit" element={
+            <ProtectedRoute>
+              <TripFormPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/trips/:id" element={
+            <ProtectedRoute>
+              <TripDetailPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/trips/:id" element={
+            <ProtectedRoute>
+              <AdminTripDetailPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/shared/:token" element={<SharedTripPage />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  )
 }
 
 export default App
