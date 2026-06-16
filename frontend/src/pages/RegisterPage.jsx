@@ -50,7 +50,7 @@ function RegisterPage() {
 
     try {
       await authService.register(name, email, password)
-      navigate('/login')
+      navigate('/login?registered=true')
     } catch (err) {
       setErrors({ general: 'Registration failed. Please try again.' })
     } finally {

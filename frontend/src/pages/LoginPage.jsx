@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import { authService } from '../services/authService'
 import { useAuth } from '../context/AuthContext'
 
@@ -8,7 +8,8 @@ function LoginPage() {
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState({})
   const [loading, setLoading] = useState(false)
-
+  const [searchParams] = useSearchParams()
+  const registered = searchParams.get('registered')
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -58,7 +59,11 @@ function LoginPage() {
         <h1 className="text-3xl font-bold text-center text-teal-700 mb-6">
           🌍 Travel Planner
         </h1>
-
+        {registered && (
+          <p className="text-teal-600 text-sm text-center mb-4 bg-teal-50 p-2 rounded-lg">
+            ✅ Registration successful! Please login.
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
