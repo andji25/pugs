@@ -62,6 +62,11 @@ function TripDetailPage() {
     }
   }
 
+  const refreshTrip = async () => {
+    const data = await tripService.getById(id)
+    setTrip(data)
+  }
+
   if (loading) return <p className="text-center mt-10 text-teal-700">Loading...</p>
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>
   if (!trip) return null
@@ -82,12 +87,15 @@ function TripDetailPage() {
               <h1 className="text-3xl font-bold text-teal-900">{trip.name}</h1>
               <p className="text-gray-500 mt-1">{trip.description}</p>
               <p className="text-sm text-gray-400 mt-1">
-                {new Date(trip.startDate).toLocaleDateString()} — {new Date(trip.endDate).toLocaleDateString()}
+                {new Date(trip.startDate).toLocaleDateString('en-GB')} — {new Date(trip.endDate).toLocaleDateString('en-GB')}
               </p>
               <div className="flex gap-4 mt-3 text-sm">
                 <span className="text-teal-600 font-medium">Budget: {trip.budget}€</span>
                 <span className="text-orange-500 font-medium">Spent: {trip.totalExpenses}€</span>
-                <span className="text-blue-500 font-medium">Remaining: {trip.remainingBudget}€</span>
+                <span className={`font-medium text-sm ${trip.remainingBudget < 0 ? 'text-red-600 font-bold' : 'text-blue-500'}`}>
+                  Remaining: {trip.remainingBudget}€
+                  {trip.remainingBudget < 0 && ' ⚠️ Over budget!'}
+                </span>
               </div>
             </div>
             <div className="flex gap-2">
@@ -129,9 +137,9 @@ function TripDetailPage() {
         </div>
 
         <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-xl p-6 shadow-sm">
-          {activeTab === 'destinations' && <DestinationTab tripId={id} />}
-          {activeTab === 'activities' && <ActivitiesTab tripId={id} />}
-          {activeTab === 'expenses' && <ExpensesTab tripId={id} budget={trip.budget} />}
+          {activeTab === 'destinations' && <DestinationTab tripId={id} startDate={trip.startDate} endDate={trip.endDate} />}
+          {activeTab === 'activities' && <ActivitiesTab tripId={id} startDate={trip.startDate} endDate={trip.endDate} remainingBudget={trip.remainingBudget} onRefresh={refreshTrip} />}
+          {activeTab === 'expenses' && <ExpensesTab tripId={id} budget={trip.budget} startDate={trip.startDate} endDate={trip.endDate} onRefresh={refreshTrip} />}
           {activeTab === 'checklist' && <ChecklistTab tripId={id} />}
         </div>
 

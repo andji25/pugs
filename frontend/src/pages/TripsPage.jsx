@@ -53,7 +53,7 @@ function TripsPage() {
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-semibold text-teal-900">✈️ {trip.name}</h3>
                   <span className="text-sm text-gray-500">
-                    {new Date(trip.startDate).toLocaleDateString()} — {new Date(trip.endDate).toLocaleDateString()}
+                    {new Date(trip.startDate).toLocaleDateString('en-GB')} — {new Date(trip.endDate).toLocaleDateString('en-GB')}
                   </span>
                 </div>
                 <p className="text-gray-500 text-sm mt-1">{trip.description}</p>

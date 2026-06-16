@@ -95,7 +95,7 @@ function AdminTripDetailPage() {
           <h1 className="text-3xl font-bold text-teal-900">{trip.name}</h1>
           {trip.description && <p className="text-gray-500 mt-1">{trip.description}</p>}
           <p className="text-sm text-gray-400 mt-1">
-            {new Date(trip.startDate).toLocaleDateString()} — {new Date(trip.endDate).toLocaleDateString()}
+            {new Date(trip.startDate).toLocaleDateString('en-GB')} — {new Date(trip.endDate).toLocaleDateString('en-GB')}
           </p>
           <div className="flex gap-4 mt-3 text-sm">
             <span className="text-teal-600 font-medium">Budget: {trip.budget}€</span>
@@ -151,7 +151,7 @@ function AdminTripDetailPage() {
                         <h4 className="font-semibold text-teal-900">📍 {d.name}</h4>
                         <p className="text-sm text-gray-500">{d.location}</p>
                         <p className="text-sm text-gray-400">
-                          {new Date(d.arrivalDate).toLocaleDateString()} — {new Date(d.departureDate).toLocaleDateString()}
+                          {new Date(d.arrivalDate).toLocaleDateString('en-GB')} — {new Date(d.departureDate).toLocaleDateString('en-GB')}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -214,7 +214,7 @@ function AdminTripDetailPage() {
                       <div>
                         <h4 className="font-semibold text-teal-900">🎯 {a.name}</h4>
                         <p className="text-sm text-gray-500">
-                          {new Date(a.date).toLocaleDateString()} {a.time && `at ${a.time}`}
+                          {new Date(a.date).toLocaleDateString('en-GB')} {a.time && `at ${a.time}`}
                         </p>
                         {a.location && <p className="text-sm text-gray-400">📍 {a.location}</p>}
                       </div>

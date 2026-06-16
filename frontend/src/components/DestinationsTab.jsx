@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { destinationService } from '../services/destinationService'
 
-function DestinationsTab({ tripId }) {
+function DestinationsTab({ tripId, startDate, endDate }) {
   const [destinations, setDestinations] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -44,11 +44,17 @@ function DestinationsTab({ tripId }) {
     } else if (form.location.trim().length < 2) {
       newErrors.location = 'Location must be at least 2 characters'
     }
-    if (!form.arrivalDate) newErrors.arrivalDate = 'Arrival date is required'
+    if (!form.arrivalDate) {
+      newErrors.arrivalDate = 'Arrival date is required'
+    } else if (form.arrivalDate < startDate?.split('T')[0] || form.arrivalDate > endDate?.split('T')[0]) {
+      newErrors.arrivalDate = 'Arrival date must be within the trip period'
+    }
     if (!form.departureDate) {
       newErrors.departureDate = 'Departure date is required'
     } else if (form.departureDate < form.arrivalDate) {
       newErrors.departureDate = 'Departure date cannot be before arrival date'
+    } else if (form.departureDate > endDate?.split('T')[0]) {
+      newErrors.departureDate = 'Departure date must be within the trip period'
     }
     return newErrors
   }
@@ -144,13 +150,13 @@ function DestinationsTab({ tripId }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-teal-800 mb-1">Arrival Date</label>
-              <input type="date" name="arrivalDate" value={form.arrivalDate} onChange={handleChange}
+              <input type="date" name="arrivalDate" value={form.arrivalDate} onChange={handleChange} min={startDate?.split('T')[0]} max={endDate?.split('T')[0]}
                 className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none ${errors.arrivalDate ? 'border-red-400' : 'border-sky-200'}`} />
               {errors.arrivalDate && <p className="text-red-500 text-sm mt-1">{errors.arrivalDate}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-teal-800 mb-1">Departure Date</label>
-              <input type="date" name="departureDate" value={form.departureDate} onChange={handleChange}
+              <input type="date" name="departureDate" value={form.departureDate} onChange={handleChange} min={startDate?.split('T')[0]} max={endDate?.split('T')[0]}
                 className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none ${errors.departureDate ? 'border-red-400' : 'border-sky-200'}`} />
               {errors.departureDate && <p className="text-red-500 text-sm mt-1">{errors.departureDate}</p>}
             </div>
@@ -188,7 +194,7 @@ function DestinationsTab({ tripId }) {
                 <h4 className="font-semibold text-teal-900">📍 {dest.name}</h4>
                 <p className="text-sm text-gray-500">{dest.location}</p>
                 <p className="text-sm text-gray-400">
-                  {new Date(dest.arrivalDate).toLocaleDateString()} — {new Date(dest.departureDate).toLocaleDateString()}
+                  {new Date(dest.arrivalDate).toLocaleDateString('en-GB')} — {new Date(dest.departureDate).toLocaleDateString('en-GB')}
                 </p>
                 {dest.description && <p className="text-sm text-gray-500 mt-1">{dest.description}</p>}
               </div>

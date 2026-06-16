@@ -4,7 +4,7 @@ import { expenseService } from "../services/expenseService"
 const CATEGORY_OPTIONS = ['Transport', 'Accommodation', 'Food', 'Tickets', 'Shopping', 'Other']
 const CATEGORY_MAP = { 'Transport': 0, 'Accommodation': 1, 'Food': 2, 'Tickets': 3, 'Shopping': 4, 'Other': 5 }
 
-function ExpensesTab({ tripId, budget }) {
+function ExpensesTab({ tripId, budget, startDate, endDate, onRefresh }) {
   const [expenses, setExpenses] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -41,8 +41,17 @@ function ExpensesTab({ tripId, budget }) {
     } else if (form.name.trim().length < 2) {
       newErrors.name = 'Name must be at least 2 characters'
     }
-    if (!form.date) newErrors.date = 'Date is required'
-    if (!form.amount || form.amount <= 0) newErrors.amount = 'Amount must be greater than zero'
+    const minDate = new Date(new Date(startDate).setDate(new Date(startDate).getDate() - 30)).toISOString().split('T')[0]
+    if (!form.date) {
+      newErrors.date = 'Date is required'
+    } else if (form.date < minDate || form.date > endDate?.split('T')[0]) {
+      newErrors.date = 'Date must be within 30 days before trip or during the trip'
+    }
+    if (form.amount <= 0) {
+      newErrors.amount = 'Amount must be greater than zero'
+    } else if (form.amount && parseFloat(form.amount) > remainingBudget) {
+      newErrors.amount = `Amount exceeds remaining budget of ${remainingBudget}€`
+    }
     return newErrors
   }
 
@@ -65,6 +74,7 @@ function ExpensesTab({ tripId, budget }) {
         await expenseService.create(form)
       }
       await fetchExpenses()
+      onRefresh()
       resetForm()
     } catch (err) {
       console.error(err)
@@ -89,6 +99,7 @@ function ExpensesTab({ tripId, budget }) {
     try {
       await expenseService.delete(id)
       await fetchExpenses()
+      onRefresh()
     } catch (err) {
       console.error(err)
     }
@@ -156,7 +167,7 @@ function ExpensesTab({ tripId, budget }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-teal-800 mb-1">Date</label>
-            <input type="date" name="date" value={form.date} onChange={handleChange}
+            <input type="date" name="date" value={form.date} onChange={handleChange} min={new Date(new Date(startDate).setDate(new Date(startDate).getDate() - 30)).toISOString().split('T')[0]} max={endDate?.split('T')[0]}
               className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none ${errors.date ? 'border-red-400' : 'border-sky-200'}`} />
             {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
           </div>
@@ -188,7 +199,7 @@ function ExpensesTab({ tripId, budget }) {
                 <div>
                   <h4 className="font-semibold text-teal-900">💰 {expense.name}</h4>
                   <p className="text-sm text-gray-500">{getCategoryLabel(expense.category)}</p>
-                  <p className="text-sm text-gray-400">{new Date(expense.date).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-400">{new Date(expense.date).toLocaleDateString('en-GB')}</p>
                   {expense.description && <p className="text-sm text-gray-500 mt-1">{expense.description}</p>}
                 </div>
                 <div className="flex flex-col items-end gap-2">

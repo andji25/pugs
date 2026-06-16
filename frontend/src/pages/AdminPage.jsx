@@ -151,7 +151,7 @@ function AdminPage() {
                     <div>
                       <h3 className="font-semibold text-teal-900">✈️ {t.name}</h3>
                       <p className="text-sm text-gray-500">
-                        {new Date(t.startDate).toLocaleDateString()} — {new Date(t.endDate).toLocaleDateString()}
+                        {new Date(t.startDate).toLocaleDateString('en-GB')} — {new Date(t.endDate).toLocaleDateString('en-GB')}
                       </p>
                       <p className="text-sm text-gray-500">
                         Budget: {t.budget}€ | Spent: {t.totalExpenses}€ | Remaining: {t.remainingBudget}€

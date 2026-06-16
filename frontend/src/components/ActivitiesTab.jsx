@@ -5,7 +5,7 @@ import CalendarView from './CalendarView'
 const STATUS_OPTIONS = ['Planned', 'Reserved', 'Completed', 'Cancelled']
 const STATUS_MAP = { 'Planned': 0, 'Reserved': 1, 'Completed': 2, 'Cancelled': 3 }
 
-function ActivitiesTab({ tripId }) {
+function ActivitiesTab({ tripId, startDate, endDate, remainingBudget, onRefresh }) {
   const [activities, setActivities] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -45,8 +45,16 @@ function ActivitiesTab({ tripId }) {
     } else if (form.name.trim().length < 2) {
       newErrors.name = 'Name must be at least 2 characters'
     }
-    if (!form.date) newErrors.date = 'Date is required'
-    if (form.estimatedCost < 0) newErrors.estimatedCost = 'Cost cannot be negative'
+    if (!form.date) {
+      newErrors.date = 'Date is required'
+    } else if (form.date < startDate?.split('T')[0] || form.date > endDate?.split('T')[0]) {
+      newErrors.date = 'Date must be within the trip period'
+    }
+    if (form.estimatedCost < 0) {
+      newErrors.estimatedCost = 'Cost cannot be negative'
+    } else if (form.estimatedCost && parseFloat(form.estimatedCost) > remainingBudget) {
+      newErrors.estimatedCost = `Estimated cost exceeds remaining budget of ${remainingBudget}€`
+    }
     return newErrors
   }
 
@@ -81,6 +89,7 @@ function ActivitiesTab({ tripId }) {
         await activityService.create(form)
       }
       await fetchActivities()
+      onRefresh()
       resetForm()
     } catch (err) {
       console.error(err)
@@ -108,6 +117,7 @@ function ActivitiesTab({ tripId }) {
     try {
       await activityService.delete(id)
       await fetchActivities()
+      onRefresh()
     } catch (err) {
       console.error(err)
     }
@@ -168,7 +178,7 @@ function ActivitiesTab({ tripId }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-teal-800 mb-1">Date</label>
-              <input type="date" name="date" value={form.date} onChange={handleChange}
+              <input type="date" name="date" value={form.date} onChange={handleChange} min={startDate?.split('T')[0]} max={endDate?.split('T')[0]}
                 className={`w-full px-3 py-2 rounded-lg border bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none ${errors.date ? 'border-red-400' : 'border-sky-200'}`} />
               {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
             </div>

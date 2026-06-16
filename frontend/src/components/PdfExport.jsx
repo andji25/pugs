@@ -14,7 +14,7 @@ function PdfExport({ trip, destinations, activities, expenses, checklist }) {
     doc.setTextColor(0, 0, 0)
     doc.setFontSize(11)
     let y = 40
-    doc.text(`Period: ${new Date(trip.startDate).toLocaleDateString()} - ${new Date(trip.endDate).toLocaleDateString()}`, 14, y)
+    doc.text(`Period: ${new Date(trip.startDate).toLocaleDateString('en-GB')} - ${new Date(trip.endDate).toLocaleDateString('en-GB')}`, 14, y)
     y += 7
     if (trip.description) {
       doc.text(`Description: ${trip.description}`, 14, y)
@@ -39,8 +39,8 @@ function PdfExport({ trip, destinations, activities, expenses, checklist }) {
         body: destinations.map(d => [
           d.name,
           d.location,
-          new Date(d.arrivalDate).toLocaleDateString(),
-          new Date(d.departureDate).toLocaleDateString()
+          new Date(d.arrivalDate).toLocaleDateString('en-GB'),
+          new Date(d.departureDate).toLocaleDateString('en-GB')
         ]),
         headStyles: { fillColor: [2, 132, 199] }
       })
@@ -52,7 +52,7 @@ function PdfExport({ trip, destinations, activities, expenses, checklist }) {
         head: [['Activity', 'Date', 'Time', 'Location', 'Cost']],
         body: activities.map(a => [
           a.name,
-          new Date(a.date).toLocaleDateString(),
+          new Date(a.date).toLocaleDateString('en-GB'),
           a.time || '-',
           a.location || '-',
           `${a.estimatedCost}€`
@@ -69,7 +69,7 @@ function PdfExport({ trip, destinations, activities, expenses, checklist }) {
           e.name,
           e.category,
           `${e.amount}€`,
-          new Date(e.date).toLocaleDateString()
+          new Date(e.date).toLocaleDateString('en-GB')
         ]),
         headStyles: { fillColor: [234, 88, 12] }
       })

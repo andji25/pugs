@@ -49,7 +49,7 @@ function SharedTripPage() {
           <h1 className="text-3xl font-bold text-teal-900 mb-2">{trip.name}</h1>
           {trip.description && <p className="text-gray-500 mb-3">{trip.description}</p>}
           <p className="text-sm text-gray-400 mb-3">
-            {new Date(trip.startDate).toLocaleDateString()} — {new Date(trip.endDate).toLocaleDateString()}
+            {new Date(trip.startDate).toLocaleDateString('en-GB')} — {new Date(trip.endDate).toLocaleDateString('en-GB')}
           </p>
           <div className="flex gap-4 text-sm">
             <span className="text-teal-600 font-medium">Budget: {trip.budget}€</span>

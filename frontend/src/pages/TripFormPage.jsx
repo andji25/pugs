@@ -131,6 +131,7 @@ function TripFormPage() {
                   name="startDate"
                   value={form.startDate}
                   onChange={handleChange}
+                  min={new Date().toISOString().split('T')[0]}
                   className={`w-full px-4 py-3 rounded-lg border bg-white/80 text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none ${errors.startDate ? 'border-red-400' : 'border-sky-200'}`}
                 />
                 {errors.startDate && <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>}
