@@ -241,41 +241,47 @@ function ActivitiesTab({ tripId, startDate, endDate, remainingBudget, onRefresh 
                   📅 {new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                 </h3>
                 <div className="flex flex-col gap-2">
-                  {groupedActivities[date].map(activity => (
-                    <div key={activity.id} className="bg-white/80 rounded-xl p-4 border border-sky-200">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h4 className="font-semibold text-teal-900">🎯 {activity.name}</h4>
-                          <p className="text-sm text-gray-500">
-                            {activity.time && `at ${activity.time}`}
-                          </p>
-                          {activity.location && <p className="text-sm text-gray-400">📍 {activity.location}</p>}
-                          {activity.description && <p className="text-sm text-gray-500 mt-1">{activity.description}</p>}
-                          <p className="text-sm text-teal-600 font-medium mt-1">Est. cost: {activity.estimatedCost}€</p>
-                        </div>
-                        <div className="flex flex-col gap-2 items-end">
-                          <select
-                            value={getStatusLabel(activity.status)}
-                            onChange={(e) => handleStatusChange(activity.id, e.target.value)}
-                            className="text-sm border border-sky-200 rounded-lg px-2 py-1 bg-white text-teal-700 outline-none">
-                            {STATUS_OPTIONS.map(s => (
-                              <option key={s} value={s}>{s}</option>
-                            ))}
-                          </select>
-                          <div className="flex gap-2">
-                            <button onClick={() => handleEdit(activity)}
-                              className="border border-teal-400 text-teal-600 px-3 py-1 rounded-lg text-sm hover:bg-teal-50 transition">
-                              ✏️
-                            </button>
-                            <button onClick={() => handleDelete(activity.id)}
-                              className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">
-                              🗑️
-                            </button>
+                  {groupedActivities[date].map(activity => {
+                    const isPast = new Date(activity.date) < new Date()
+                    return (
+                      <div key={activity.id} className={`bg-white/80 rounded-xl p-4 border ${isPast ? 'border-gray-200 opacity-60' : 'border-sky-200'}`}>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-teal-900">🎯 {activity.name}</h4>
+                              {isPast && <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">Past</span>}
+                            </div>
+                            {activity.time && (
+                              <p className="text-sm text-gray-500">⏰ at {activity.time.substring(0, 5)}</p>
+                            )}
+                            {activity.location && <p className="text-sm text-gray-400">📍 {activity.location}</p>}
+                            {activity.description && <p className="text-sm text-gray-500 mt-1">{activity.description}</p>}
+                            <p className="text-sm text-teal-600 font-medium mt-1">Est. cost: {activity.estimatedCost}€</p>
+                          </div>
+                          <div className="flex flex-col gap-2 items-end">
+                            <select
+                              value={getStatusLabel(activity.status)}
+                              onChange={(e) => handleStatusChange(activity.id, e.target.value)}
+                              className="text-sm border border-sky-200 rounded-lg px-2 py-1 bg-white text-teal-700 outline-none">
+                              {STATUS_OPTIONS.map(s => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                            <div className="flex gap-2">
+                              <button onClick={() => handleEdit(activity)}
+                                className="border border-teal-400 text-teal-600 px-3 py-1 rounded-lg text-sm hover:bg-teal-50 transition">
+                                ✏️
+                              </button>
+                              <button onClick={() => handleDelete(activity.id)}
+                                className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">
+                                🗑️
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             ))}

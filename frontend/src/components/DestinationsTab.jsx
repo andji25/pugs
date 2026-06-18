@@ -197,6 +197,11 @@ function DestinationsTab({ tripId, startDate, endDate }) {
                   {new Date(dest.arrivalDate).toLocaleDateString('en-GB')} — {new Date(dest.departureDate).toLocaleDateString('en-GB')}
                 </p>
                 {dest.description && <p className="text-sm text-gray-500 mt-1">{dest.description}</p>}
+                {dest.notes && (
+                  <div className="mt-2 p-2 bg-amber-50 rounded-lg border border-amber-200">
+                    <p className="text-xs font-medium text-amber-700">📝 {dest.notes}</p>
+                  </div>
+                )}
               </div>
               <div className="flex gap-2">
                 <button onClick={() => handleEdit(dest)}

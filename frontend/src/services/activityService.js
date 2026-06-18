@@ -18,7 +18,10 @@ export const activityService = {
     const response = await fetch(`${API_URL}/api/activities`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify(dto)
+      body: JSON.stringify({
+        ...dto,
+        time: dto.time || null
+      })
     })
     if (!response.ok) throw new Error('Failed to create activity')
     return response.json()
@@ -28,7 +31,10 @@ export const activityService = {
     const response = await fetch(`${API_URL}/api/activities/${id}`, {
       method: 'PUT',
       headers: getHeaders(),
-      body: JSON.stringify(dto)
+      body: JSON.stringify({
+        ...dto,
+        time: dto.time || null
+      })
     })
     if (!response.ok) throw new Error('Failed to update activity')
     return response.json()

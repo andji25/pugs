@@ -24,6 +24,8 @@ function TripDetailPage() {
   const [activities, setActivities] = useState([])
   const [expenses, setExpenses] = useState([])
   const [checklist, setChecklist] = useState([])
+  const [editingNotes, setEditingNotes] = useState(false)
+  const [notesValue, setNotesValue] = useState('')
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -66,6 +68,12 @@ function TripDetailPage() {
     const data = await tripService.getById(id)
     setTrip(data)
   }
+
+  useEffect(() => {
+    if (trip) {
+      setNotesValue(trip.notes || '')
+    }
+  }, [trip])
 
   if (loading) return <p className="text-center mt-10 text-teal-700">Loading...</p>
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>
@@ -122,6 +130,42 @@ function TripDetailPage() {
                 🗑️ Delete
               </button>
             </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200 w-full">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm font-semibold text-amber-700">📝 Notes</p>
+              <button
+                onClick={() => setEditingNotes(!editingNotes)}
+                className="text-xs text-amber-600 hover:text-amber-800 border border-amber-300 px-2 py-1 rounded-lg transition">
+                {editingNotes ? 'Cancel' : '✏️ Edit'}
+              </button>
+            </div>
+            {editingNotes ? (
+              <div>
+                <textarea
+                  value={notesValue}
+                  onChange={(e) => setNotesValue(e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg border border-amber-300 bg-white text-gray-800 focus:ring-2 focus:ring-amber-400 outline-none text-sm"
+                  placeholder="Add notes..."
+                />
+                <button
+                  onClick={async () => {
+                    await tripService.update(id, { ...trip, notes: notesValue })
+                    await refreshTrip()
+                    setNotesValue(notesValue)
+                    setEditingNotes(false)
+                  }}
+                  className="mt-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-1 rounded-lg text-sm transition">
+                  Save
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm text-amber-600">
+                {notesValue || <span className="text-amber-400 italic">No notes yet. Click Edit to add.</span>}
+              </p>
+            )}
           </div>
         </div>
 

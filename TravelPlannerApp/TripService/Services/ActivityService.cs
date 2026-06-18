@@ -24,6 +24,7 @@ namespace TripService.Services
                     Id = a.Id,
                     Name = a.Name,
                     Date = a.Date,
+                    Time = a.Time,
                     Location = a.Location,
                     Description = a.Description,
                     EstimatedCost = a.EstimatedCost,

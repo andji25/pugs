@@ -56,7 +56,8 @@ function ExpensesTab({ tripId, budget, startDate, endDate, onRefresh }) {
   }
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const value = e.target.name === 'category' ? parseInt(e.target.value) : e.target.value
+    setForm({ ...form, [e.target.name]: value })
   }
 
   const handleSubmit = async (e) => {
@@ -188,38 +189,53 @@ function ExpensesTab({ tripId, budget, startDate, endDate, onRefresh }) {
           </div>
         </form>
       )}
-
       {expenses.length === 0 ? (
         <p className="text-center text-gray-400 py-8">No expenses yet.</p>
       ) : (
-        <div className="flex flex-col gap-3">
-          {expenses.map(expense => (
-            <div key={expense.id} className="bg-white/80 rounded-xl p-4 border border-sky-200">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-semibold text-teal-900">💰 {expense.name}</h4>
-                  <p className="text-sm text-gray-500">{getCategoryLabel(expense.category)}</p>
-                  <p className="text-sm text-gray-400">{new Date(expense.date).toLocaleDateString('en-GB')}</p>
-                  {expense.description && <p className="text-sm text-gray-500 mt-1">{expense.description}</p>}
+        <div className="flex flex-col gap-4">
+          {CATEGORY_OPTIONS.map((category, categoryIndex) => {
+            const categoryExpenses = expenses.filter(e => e.category === categoryIndex)
+            if (categoryExpenses.length === 0) return null
+            const categoryTotal = categoryExpenses.reduce((sum, e) => sum + e.amount, 0)
+            const categoryEmojis = ['🚗', '🏨', '🍔', '🎟️', '🛍️', '📦']
+            return (
+              <div key={category} className="bg-white/80 rounded-xl border border-sky-200 overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2 bg-sky-50 border-b border-sky-200">
+                  <span className="font-semibold text-teal-800">
+                    {categoryEmojis[categoryIndex]} {category}
+                  </span>
+                  <span className="text-orange-500 font-semibold">{categoryTotal}€</span>
                 </div>
-                <div className="flex flex-col items-end gap-2">
-                  <span className="text-orange-500 font-semibold">{expense.amount}€</span>
-                  <div className="flex gap-2">
-                    <button onClick={() => handleEdit(expense)}
-                      className="border border-teal-400 text-teal-600 px-3 py-1 rounded-lg text-sm hover:bg-teal-50 transition">
-                      ✏️
-                    </button>
-                    <button onClick={() => handleDelete(expense.id)}
-                      className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">
-                      🗑️
-                    </button>
-                  </div>
+                <div className="flex flex-col">
+                  {categoryExpenses.map(expense => (
+                    <div key={expense.id} className="flex items-start justify-between p-4 border-b border-sky-100 last:border-0">
+                      <div>
+                        <h4 className="font-medium text-teal-900">{expense.name}</h4>
+                        <p className="text-sm text-gray-400">{new Date(expense.date).toLocaleDateString('en-GB')}</p>
+                        {expense.description && <p className="text-sm text-gray-500 mt-1">{expense.description}</p>}
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <span className="text-orange-500 font-semibold">{expense.amount}€</span>
+                        <div className="flex gap-2">
+                          <button onClick={() => handleEdit(expense)}
+                            className="border border-teal-400 text-teal-600 px-3 py-1 rounded-lg text-sm hover:bg-teal-50 transition">
+                            ✏️
+                          </button>
+                          <button onClick={() => handleDelete(expense.id)}
+                            className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
+
     </div>
   )
 }

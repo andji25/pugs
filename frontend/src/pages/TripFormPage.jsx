@@ -73,8 +73,10 @@ function TripFormPage() {
     try {
       if (isEdit) {
         await tripService.update(id, form)
+        navigate(`/trips/${id}`)
       } else {
         await tripService.create(form)
+        navigate('/trips')
       }
       navigate('/trips')
     } catch (err) {
