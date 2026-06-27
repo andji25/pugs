@@ -10,6 +10,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [searchParams] = useSearchParams()
   const registered = searchParams.get('registered')
+  const redirect = searchParams.get('redirect')
   const { login } = useAuth()
   const navigate = useNavigate()
 
@@ -44,7 +45,7 @@ function LoginPage() {
     try {
       const data = await authService.login(email, password)
       login(data)
-      navigate('/trips')
+      navigate(redirect || '/trips')
     } catch (err) {
       setErrors({ general: 'Invalid email or password' })
     } finally {

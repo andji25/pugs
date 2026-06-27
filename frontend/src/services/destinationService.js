@@ -14,6 +14,12 @@ export const destinationService = {
     return response.json()
   },
 
+  async getDestinationsPublic(tripId) {
+    const response = await fetch(`${API_URL}/api/destinations/trip/${tripId}`)
+    if (!response.ok) throw new Error('Failed to fetch destinations')
+    return response.json()
+  },
+
   async create(dto) {
     const response = await fetch(`${API_URL}/api/destinations`, {
       method: 'POST',

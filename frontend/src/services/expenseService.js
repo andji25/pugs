@@ -14,6 +14,12 @@ export const expenseService = {
     return response.json()
   },
 
+  async getExpensesPublic(tripId) {
+    const response = await fetch(`${API_URL}/api/expenses/trip/${tripId}`)
+    if (!response.ok) throw new Error('Failed to fetch expenses')
+    return response.json()
+  },
+
   async create(dto) {
     const response = await fetch(`${API_URL}/api/expenses`, {
       method: 'POST',

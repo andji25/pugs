@@ -18,6 +18,7 @@ namespace TripService.Controllers
         }
 
         [HttpGet("trip/{tripId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetByTrip(int tripId)
         {
             try

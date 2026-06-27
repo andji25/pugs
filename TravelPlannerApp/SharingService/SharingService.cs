@@ -1,20 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Fabric;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.ServiceFabric.Data;
 using Microsoft.ServiceFabric.Services.Communication.AspNetCore;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
-using Microsoft.ServiceFabric.Data;
 using SharingService.Data;
 using SharingService.Services;
+using System.Fabric;
 using System.Text;
 
 namespace SharingService
@@ -74,18 +67,17 @@ namespace SharingService
                         builder.Services.AddSwaggerGen();
 
                         builder.WebHost
-                            .UseKestrel()
-                            .UseContentRoot(Directory.GetCurrentDirectory())
-                            .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.UseUniqueServiceUrl)
-                            .UseUrls(url);
+    .UseContentRoot(Directory.GetCurrentDirectory())
+    .UseServiceFabricIntegration(listener, ServiceFabricIntegrationOptions.None)
+    .UseUrls("http://0.0.0.0:8083");
 
                         var app = builder.Build();
 
-                        if (app.Environment.IsDevelopment())
-                        {
-                            app.UseSwagger();
-                            app.UseSwaggerUI();
-                        }
+                        
+                        
+                        app.UseSwagger();
+                        app.UseSwaggerUI();
+                        
 
                         app.UseCors("AllowFrontend");
                         app.UseAuthentication();

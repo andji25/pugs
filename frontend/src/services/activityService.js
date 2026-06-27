@@ -14,6 +14,12 @@ export const activityService = {
     return response.json()
   },
 
+  async getActivitiesPublic(tripId) {
+    const response = await fetch(`${API_URL}/api/activities/trip/${tripId}`)
+    if (!response.ok) throw new Error('Failed to fetch activities')
+    return response.json()
+  },
+
   async create(dto) {
     const response = await fetch(`${API_URL}/api/activities`, {
       method: 'POST',

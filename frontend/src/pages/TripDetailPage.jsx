@@ -76,7 +76,17 @@ function TripDetailPage() {
   }, [trip])
 
   if (loading) return <p className="text-center mt-10 text-teal-700">Loading...</p>
-  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>
+  if (error) return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-sky-100 to-blue-200 flex items-center justify-center">
+      <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 text-center shadow-xl">
+        <p className="text-5xl mb-4">🔒</p>
+        <p className="text-red-500 font-medium">You don't have access to this trip.</p>
+        <button onClick={() => navigate('/trips')} className="mt-4 bg-teal-600 text-white px-4 py-2 rounded-lg text-sm">
+          Go to My Trips
+        </button>
+      </div>
+    </div>
+  )
   if (!trip) return null
 
   return (
