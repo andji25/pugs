@@ -71,7 +71,8 @@ function ActivitiesTab({ tripId, startDate, endDate, remainingBudget, onRefresh 
   const sortedDates = Object.keys(groupedActivities).sort()
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const value = e.target.name === 'status' ? parseInt(e.target.value) : e.target.value
+    setForm({ ...form, [e.target.name]: value })
   }
 
   const handleSubmit = async (e) => {

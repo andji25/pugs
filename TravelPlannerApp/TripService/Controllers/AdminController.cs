@@ -13,12 +13,20 @@ namespace TripService.Controllers
         private readonly TripManagementService _tripService;
         private readonly DestinationService _destinationService;
         private readonly ActivityService _activityService;
-
-        public AdminController(TripManagementService tripService, DestinationService destinationService, ActivityService activityService)
+        private readonly ExpenseService _expenseService;
+        private readonly ChecklistService _checklistService;
+        public AdminController(
+            TripManagementService tripService,
+            DestinationService destinationService,
+            ActivityService activityService,
+            ExpenseService expenseService,
+            ChecklistService checklistService)
         {
             _tripService = tripService;
             _destinationService = destinationService;
             _activityService = activityService;
+            _expenseService = expenseService;
+            _checklistService = checklistService;
         }
 
         [HttpGet("trips")]
@@ -167,6 +175,76 @@ namespace TripService.Controllers
             try
             {
                 await _activityService.DeleteActivity(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("expenses/trip/{tripId}")]
+        public async Task<IActionResult> GetExpensesByTrip(int tripId)
+        {
+            try
+            {
+                var expenses = await _expenseService.GetExpensesByTrip(tripId);
+                return Ok(expenses);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("expenses/{id}")]
+        public async Task<IActionResult> UpdateExpense(int id, CreateExpenseDto dto)
+        {
+            try
+            {
+                var expense = await _expenseService.UpdateExpense(id, dto);
+                return Ok(expense);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("expenses/{id}")]
+        public async Task<IActionResult> DeleteExpense(int id)
+        {
+            try
+            {
+                await _expenseService.DeleteExpense(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("checklist/trip/{tripId}")]
+        public async Task<IActionResult> GetChecklistByTrip(int tripId)
+        {
+            try
+            {
+                var items = await _checklistService.GetChecklistByTrip(tripId);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("checklist/{id}")]
+        public async Task<IActionResult> DeleteChecklistItem(int id)
+        {
+            try
+            {
+                await _checklistService.DeleteChecklistItem(id);
                 return NoContent();
             }
             catch (Exception ex)

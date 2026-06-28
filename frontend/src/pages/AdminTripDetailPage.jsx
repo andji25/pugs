@@ -8,12 +8,17 @@ function AdminTripDetailPage() {
   const [trip, setTrip] = useState(null)
   const [destinations, setDestinations] = useState([])
   const [activities, setActivities] = useState([])
+  const [expenses, setExpenses] = useState([])
+  const [checklist, setChecklist] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showDestinations, setShowDestinations] = useState(false)
   const [showActivities, setShowActivities] = useState(false)
+  const [showExpenses, setShowExpenses] = useState(false)
+  const [showChecklist, setShowChecklist] = useState(false)
   const [editingDestination, setEditingDestination] = useState(null)
   const [editingActivity, setEditingActivity] = useState(null)
+  const [editingExpense, setEditingExpense] = useState(null)
 
   useEffect(() => {
     fetchData()
@@ -21,14 +26,18 @@ function AdminTripDetailPage() {
 
   const fetchData = async () => {
     try {
-      const [tripData, destData, actData] = await Promise.all([
+      const [tripData, destData, actData, expData, checkData] = await Promise.all([
         adminService.getTripById(id),
         adminService.getDestinationsByTrip(id),
-        adminService.getActivitiesByTrip(id)
+        adminService.getActivitiesByTrip(id),
+        adminService.getExpensesByTrip(id),
+        adminService.getChecklistByTrip(id)
       ])
       setTrip(tripData)
       setDestinations(destData)
       setActivities(actData)
+      setExpenses(expData)
+      setChecklist(checkData)
     } catch (err) {
       setError('Failed to load trip details')
     } finally {
@@ -75,6 +84,37 @@ function AdminTripDetailPage() {
       setActivities(activities.filter(a => a.id !== actId))
     } catch (err) {
       setError('Failed to delete activity')
+    }
+  }
+
+  const handleUpdateExpense = async (e) => {
+    e.preventDefault()
+    try {
+      const updated = await adminService.updateExpense(editingExpense.id, editingExpense)
+      setExpenses(expenses.map(exp => exp.id === updated.id ? updated : exp))
+      setEditingExpense(null)
+    } catch (err) {
+      setError('Failed to update expense')
+    }
+  }
+
+  const handleDeleteExpense = async (expId) => {
+    if (!window.confirm('Delete this expense?')) return
+    try {
+      await adminService.deleteExpense(expId)
+      setExpenses(expenses.filter(e => e.id !== expId))
+    } catch (err) {
+      setError('Failed to delete expense')
+    }
+  }
+
+  const handleDeleteChecklistItem = async (itemId) => {
+    if (!window.confirm('Delete this checklist item?')) return
+    try {
+      await adminService.deleteChecklistItem(itemId)
+      setChecklist(checklist.filter(c => c.id !== itemId))
+    } catch (err) {
+      setError('Failed to delete checklist item')
     }
   }
 
@@ -226,6 +266,88 @@ function AdminTripDetailPage() {
                       </div>
                     </div>
                   )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-xl p-4 shadow-sm mt-4">
+          <button
+            onClick={() => setShowExpenses(!showExpenses)}
+            className="flex items-center justify-between w-full text-teal-900 font-semibold">
+            <span>💰 Expenses ({expenses.length})</span>
+            <span>{showExpenses ? '▲' : '▼'}</span>
+          </button>
+
+          {showExpenses && (
+            <div className="mt-4 flex flex-col gap-3">
+              {expenses.length === 0 ? (
+                <p className="text-gray-400 text-sm">No expenses.</p>
+              ) : expenses.map(exp => (
+                <div key={exp.id} className="bg-white/80 rounded-xl p-4 border border-sky-200">
+                  {editingExpense?.id === exp.id ? (
+                    <form onSubmit={handleUpdateExpense} className="space-y-2">
+                      <input
+                        className="w-full px-3 py-2 rounded-lg border border-sky-200 bg-white text-gray-800 outline-none focus:ring-2 focus:ring-teal-400"
+                        value={editingExpense.name}
+                        onChange={e => setEditingExpense({ ...editingExpense, name: e.target.value })}
+                        placeholder="Name" />
+                      <input type="number"
+                        className="w-full px-3 py-2 rounded-lg border border-sky-200 bg-white text-gray-800 outline-none focus:ring-2 focus:ring-teal-400"
+                        value={editingExpense.amount}
+                        onChange={e => setEditingExpense({ ...editingExpense, amount: parseFloat(e.target.value) })}
+                        placeholder="Amount" />
+                      <div className="flex gap-2">
+                        <button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-1 rounded-lg text-sm transition">Save</button>
+                        <button type="button" onClick={() => setEditingExpense(null)} className="border border-sky-200 text-teal-700 px-4 py-1 rounded-lg text-sm hover:bg-white/80 transition">Cancel</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-semibold text-teal-900">💰 {exp.name}</h4>
+                        <p className="text-sm text-gray-400">{new Date(exp.date).toLocaleDateString('en-GB')}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-orange-500 font-semibold">{exp.amount}€</span>
+                        <button onClick={() => setEditingExpense(exp)}
+                          className="border border-teal-400 text-teal-600 px-3 py-1 rounded-lg text-sm hover:bg-teal-50 transition">✏️</button>
+                        <button onClick={() => handleDeleteExpense(exp.id)}
+                          className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">🗑️</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-xl p-4 shadow-sm mt-4">
+          <button
+            onClick={() => setShowChecklist(!showChecklist)}
+            className="flex items-center justify-between w-full text-teal-900 font-semibold">
+            <span>✅ Checklist ({checklist.length})</span>
+            <span>{showChecklist ? '▲' : '▼'}</span>
+          </button>
+
+          {showChecklist && (
+            <div className="mt-4 flex flex-col gap-3">
+              {checklist.length === 0 ? (
+                <p className="text-gray-400 text-sm">No checklist items.</p>
+              ) : checklist.map(item => (
+                <div key={item.id} className="bg-white/80 rounded-xl p-4 border border-sky-200 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className={item.isCompleted ? 'text-teal-600' : 'text-gray-400'}>
+                      {item.isCompleted ? '✅' : '⬜'}
+                    </span>
+                    <span className={`text-sm ${item.isCompleted ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                      {item.name}
+                    </span>
+                  </div>
+                  <button onClick={() => handleDeleteChecklistItem(item.id)}
+                    className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">🗑️</button>
                 </div>
               ))}
             </div>

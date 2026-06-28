@@ -115,5 +115,47 @@ export const adminService = {
       headers: getHeaders()
     })
     if (!response.ok) throw new Error('Failed to delete activity')
+  },
+
+  async getExpensesByTrip(tripId) {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/expenses/trip/${tripId}`, {
+      headers: getHeaders()
+    })
+    if (!response.ok) throw new Error('Failed to fetch expenses')
+    return response.json()
+  },
+
+  async updateExpense(id, dto) {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/expenses/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(dto)
+    })
+    if (!response.ok) throw new Error('Failed to update expense')
+    return response.json()
+  },
+  
+  async deleteExpense(id) {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/expenses/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    })
+    if (!response.ok) throw new Error('Failed to delete expense')
+  },
+
+  async getChecklistByTrip(tripId) {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/checklist/trip/${tripId}`, {
+      headers: getHeaders()
+    })
+    if (!response.ok) throw new Error('Failed to fetch checklist')
+    return response.json()
+  },
+  
+  async deleteChecklistItem(id) {
+    const response = await fetch(`${TRIP_API_URL}/api/admin/checklist/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    })
+    if (!response.ok) throw new Error('Failed to delete checklist item')
   }
 }
