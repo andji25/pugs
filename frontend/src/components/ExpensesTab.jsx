@@ -4,7 +4,7 @@ import { expenseService } from "../services/expenseService"
 const CATEGORY_OPTIONS = ['Transport', 'Accommodation', 'Food', 'Tickets', 'Shopping', 'Other']
 const CATEGORY_MAP = { 'Transport': 0, 'Accommodation': 1, 'Food': 2, 'Tickets': 3, 'Shopping': 4, 'Other': 5 }
 
-function ExpensesTab({ tripId, budget, startDate, endDate, onRefresh }) {
+function ExpensesTab({ tripId, budget, startDate, endDate, remainingBudget: externalRemainingBudget, onRefresh }) {
   const [expenses, setExpenses] = useState([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -49,7 +49,7 @@ function ExpensesTab({ tripId, budget, startDate, endDate, onRefresh }) {
     }
     if (form.amount <= 0) {
       newErrors.amount = 'Amount must be greater than zero'
-    } else if (form.amount && parseFloat(form.amount) > remainingBudget) {
+    } else if (form.amount && parseFloat(form.amount) > externalRemainingBudget) {
       newErrors.amount = `Amount exceeds remaining budget of ${remainingBudget}€`
     }
     return newErrors
@@ -132,7 +132,7 @@ function ExpensesTab({ tripId, budget, startDate, endDate, onRefresh }) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex gap-4 text-sm">
           <span className="text-orange-500 font-medium">Total Spent: {totalExpenses}€</span>
-          <span className="text-teal-600 font-medium">Remaining: {remainingBudget}€</span>
+          <span className="text-teal-600 font-medium">Remaining: {externalRemainingBudget}€</span>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}

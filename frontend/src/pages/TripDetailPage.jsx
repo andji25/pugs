@@ -26,6 +26,7 @@ function TripDetailPage() {
   const [checklist, setChecklist] = useState([])
   const [editingNotes, setEditingNotes] = useState(false)
   const [notesValue, setNotesValue] = useState('')
+  const [dataLoading, setDataLoading] = useState(true)
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -52,6 +53,7 @@ function TripDetailPage() {
       }
     }
     fetchTrip()
+    setDataLoading(false)
   }, [id])
 
   const handleDelete = async () => {
@@ -127,13 +129,15 @@ function TripDetailPage() {
                 className="border border-sky-400 text-sky-600 px-3 py-1 rounded-lg text-sm hover:bg-sky-50 transition">
                 🔗 Share
               </button>
-              <PdfExport
-                trip={trip}
-                destinations={destinations}
-                activities={activities}
-                expenses={expenses}
-                checklist={checklist}
-              />
+              {!dataLoading && (
+                <PdfExport
+                  trip={trip}
+                  destinations={destinations}
+                  activities={activities}
+                  expenses={expenses}
+                  checklist={checklist}
+                />
+              )}
               <button
                 onClick={handleDelete}
                 className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">
@@ -193,7 +197,7 @@ function TripDetailPage() {
         <div className="bg-white/70 backdrop-blur-sm border border-white/50 rounded-xl p-6 shadow-sm">
           {activeTab === 'destinations' && <DestinationTab tripId={id} startDate={trip.startDate} endDate={trip.endDate} />}
           {activeTab === 'activities' && <ActivitiesTab tripId={id} startDate={trip.startDate} endDate={trip.endDate} remainingBudget={trip.remainingBudget} onRefresh={refreshTrip} />}
-          {activeTab === 'expenses' && <ExpensesTab tripId={id} budget={trip.budget} startDate={trip.startDate} endDate={trip.endDate} onRefresh={refreshTrip} />}
+          {activeTab === 'expenses' && <ExpensesTab tripId={id} budget={trip.budget} startDate={trip.startDate} endDate={trip.endDate} remainingBudget={trip.remainingBudget} onRefresh={refreshTrip} />}
           {activeTab === 'checklist' && <ChecklistTab tripId={id} />}
         </div>
 
