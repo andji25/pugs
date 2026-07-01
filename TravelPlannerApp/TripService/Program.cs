@@ -1,65 +1,31 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using TripService.Data;
-using TripService.Services;
+using System;
+using System.Diagnostics;
+using System.Threading;
+using Microsoft.ServiceFabric.Services.Runtime;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<TripManagementService>();
-builder.Services.AddScoped<DestinationService>();
-builder.Services.AddScoped<ActivityService>();
-builder.Services.AddScoped<ExpenseService>();
-builder.Services.AddScoped<ChecklistService>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
-
-builder.Services.AddCors(options =>
+namespace TripService
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    internal static class Program
     {
-        /*policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-        */
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+        private static void Main()
+        {
+            try
+            {
+                ServiceRuntime.RegisterServiceAsync(
+                    "TripServiceType",
+                    context => new TripService(context)).GetAwaiter().GetResult();
 
-var app = builder.Build();
+                ServiceEventSource.Current.ServiceTypeRegistered(
+                    Process.GetCurrentProcess().Id,
+                    typeof(TripService).Name);
 
-
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
-
-app.UseCors("AllowFrontend");
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-
-app.Run();
+                Thread.Sleep(Timeout.Infinite);
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceHostInitializationFailed(e.ToString());
+                throw;
+            }
+        }
+    }
+}

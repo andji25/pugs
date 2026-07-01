@@ -1,61 +1,32 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using UserService.Data;
-using UserService.Services;
+using Microsoft.ServiceFabric.Services.Runtime;
+using System;
+using System.Diagnostics;
+using System.Threading;
+using UserService;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<AuthService>();
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-        };
-    });
-
-builder.Services.AddCors(options =>
+namespace UserService
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    internal static class Program
     {
-        /*policy.WithOrigins("http://localhost:5173")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-        */
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+        private static void Main()
+        {
+            try
+            {
+                ServiceRuntime.RegisterServiceAsync(
+                    "UserServiceType",
+                    context => new UserService(context)).GetAwaiter().GetResult();
 
-var app = builder.Build();
+                ServiceEventSource.Current.ServiceTypeRegistered(
+                    Process.GetCurrentProcess().Id,
+                    typeof(UserService).Name);
 
-
-    app.UseSwagger();
-    app.UseSwaggerUI();
-
-
-app.UseCors("AllowFrontend");
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-
-app.Run();
+                Thread.Sleep(Timeout.Infinite);
+            }
+            catch (Exception e)
+            {
+                ServiceEventSource.Current.ServiceHostInitializationFailed(e.ToString());
+                throw;
+            }
+        }
+    }
+}
