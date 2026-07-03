@@ -47,10 +47,12 @@ function ExpensesTab({ tripId, budget, startDate, endDate, remainingBudget: exte
     } else if (form.date < minDate || form.date > endDate?.split('T')[0]) {
       newErrors.date = 'Date must be within 30 days before trip or during the trip'
     }
-    if (form.amount <= 0) {
+    if (!form.amount || form.amount === '') {
+      newErrors.amount = 'Amount is required'
+    } else if (form.amount <= 0) {
       newErrors.amount = 'Amount must be greater than zero'
-    } else if (form.amount && parseFloat(form.amount) > externalRemainingBudget) {
-      newErrors.amount = `Amount exceeds remaining budget of ${remainingBudget}€`
+    } else if (parseFloat(form.amount) > externalRemainingBudget) {
+      newErrors.amount = `Amount exceeds remaining budget of ${externalRemainingBudget}€`
     }
     return newErrors
   }

@@ -50,9 +50,11 @@ function ActivitiesTab({ tripId, startDate, endDate, remainingBudget, onRefresh 
     } else if (form.date < startDate?.split('T')[0] || form.date > endDate?.split('T')[0]) {
       newErrors.date = 'Date must be within the trip period'
     }
-    if (form.estimatedCost < 0) {
+    if (!form.estimatedCost || form.estimatedCost === '') {
+      newErrors.estimatedCost = 'Estimated cost is required'
+    } else if (form.estimatedCost < 0) {
       newErrors.estimatedCost = 'Cost cannot be negative'
-    } else if (form.estimatedCost && parseFloat(form.estimatedCost) > remainingBudget) {
+    } else if (parseFloat(form.estimatedCost) > remainingBudget) {
       newErrors.estimatedCost = `Estimated cost exceeds remaining budget of ${remainingBudget}€`
     }
     return newErrors
