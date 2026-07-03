@@ -1,6 +1,8 @@
 import jsPDF from "jspdf"
 import autoTable from "jspdf-autotable"
 
+const CATEGORY_OPTIONS = ['Transport', 'Accommodation', 'Food', 'Tickets', 'Shopping', 'Other']
+
 function PdfExport({ trip, destinations, activities, expenses, checklist }) {
   const handleExport = () => {
     const doc = new jsPDF()
@@ -67,7 +69,7 @@ function PdfExport({ trip, destinations, activities, expenses, checklist }) {
         head: [['Expense', 'Category', 'Amount', 'Date']],
         body: expenses.map(e => [
           e.name,
-          e.category,
+          CATEGORY_OPTIONS[e.category] || 'Other',
           `${e.amount}€`,
           new Date(e.date).toLocaleDateString('en-GB')
         ]),
@@ -79,7 +81,7 @@ function PdfExport({ trip, destinations, activities, expenses, checklist }) {
       autoTable(doc, {
         startY: doc.lastAutoTable.finalY + 10,
         head: [['Item', 'Status']],
-        body: checklist.map(c => [c.name, c.isCompleted ? '✓ Done' : '○ Pending']),
+        body: checklist.map(c => [c.name, c.isCompleted ? 'Done' : 'Pending']),
         headStyles: { fillColor: [15, 118, 110] }
       })
     }
