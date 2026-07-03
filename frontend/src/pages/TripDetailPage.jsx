@@ -26,7 +26,6 @@ function TripDetailPage() {
   const [checklist, setChecklist] = useState([])
   const [editingNotes, setEditingNotes] = useState(false)
   const [notesValue, setNotesValue] = useState('')
-  const [dataLoading, setDataLoading] = useState(true)
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -45,7 +44,6 @@ function TripDetailPage() {
         setActivities(acts)
         setExpenses(exps)
         setChecklist(checks)
-
       } catch (err) {
         setError('Failed to load trip')
       } finally {
@@ -53,7 +51,6 @@ function TripDetailPage() {
       }
     }
     fetchTrip()
-    setDataLoading(false)
   }, [id])
 
   const handleDelete = async () => {
@@ -129,15 +126,15 @@ function TripDetailPage() {
                 className="border border-sky-400 text-sky-600 px-3 py-1 rounded-lg text-sm hover:bg-sky-50 transition">
                 🔗 Share
               </button>
-              {!dataLoading && (
-                <PdfExport
-                  trip={trip}
-                  destinations={destinations}
-                  activities={activities}
-                  expenses={expenses}
-                  checklist={checklist}
-                />
-              )}
+
+              <PdfExport
+                trip={trip}
+                destinations={destinations}
+                activities={activities}
+                expenses={expenses}
+                checklist={checklist}
+              />
+
               <button
                 onClick={handleDelete}
                 className="border border-orange-400 text-orange-500 px-3 py-1 rounded-lg text-sm hover:bg-orange-50 transition">
