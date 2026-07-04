@@ -50,6 +50,8 @@ function ActivitiesTab({ tripId, startDate, endDate, remainingBudget, onRefresh 
     } else if (form.date < startDate?.split('T')[0] || form.date > endDate?.split('T')[0]) {
       newErrors.date = 'Date must be within the trip period'
     }
+    if (!form.time) 
+      newErrors.time = 'Time is required'
     if (!form.estimatedCost || form.estimatedCost === '') {
       newErrors.estimatedCost = 'Estimated cost is required'
     } else if (form.estimatedCost < 0) {
@@ -189,6 +191,7 @@ function ActivitiesTab({ tripId, startDate, endDate, remainingBudget, onRefresh 
               <label className="block text-sm font-medium text-teal-800 mb-1">Time</label>
               <input type="time" name="time" value={form.time} onChange={handleChange}
                 className="w-full px-3 py-2 rounded-lg border border-sky-200 bg-white text-gray-800 focus:ring-2 focus:ring-teal-400 outline-none" />
+              {errors.time && <p className="text-red-500 text-sm mt-1">{errors.time}</p>}
             </div>
           </div>
           <div>

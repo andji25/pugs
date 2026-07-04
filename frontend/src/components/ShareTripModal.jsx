@@ -52,7 +52,7 @@ function ShareTripModal({ tripId, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-teal-900">🔗 Share Trip</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">✕</button>
