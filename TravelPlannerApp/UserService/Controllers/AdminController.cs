@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserService.Data;
 using UserService.DTOs;
+using UserService.Services;
 
 namespace UserService.Controllers
 {
@@ -11,11 +12,11 @@ namespace UserService.Controllers
     [Authorize(Roles = "Admin")]
     public class AdminController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly AdminService _adminService;
 
-        public AdminController(AppDbContext context)
+        public AdminController(AdminService adminService)
         {
-            _context = context;
+            _adminService = adminService;
         }
 
         [HttpGet("users")]
@@ -23,15 +24,7 @@ namespace UserService.Controllers
         {
             try
             {
-                var users = await _context.Users
-                    .Select(u => new UserResponseDto
-                    {
-                        Id = u.Id,
-                        Name = u.Name,
-                        Email = u.Email,
-                        Role = u.Role
-                    })
-                    .ToListAsync();
+                var users = await _adminService.GetUsers();
                 return Ok(users);
             }
             catch (Exception ex)
@@ -45,12 +38,7 @@ namespace UserService.Controllers
         {
             try
             {
-                var user = await _context.Users.FindAsync(id);
-                if (user == null)
-                    return NotFound(new { message = "User not found" });
-
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
+                await _adminService.DeleteUser(id);
                 return NoContent();
             }
             catch (Exception ex)

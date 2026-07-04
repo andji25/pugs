@@ -43,6 +43,7 @@ namespace UserService
 
   
                         builder.Services.AddScoped<AuthService>();
+                        builder.Services.AddScoped<AdminService>();
 
                         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             .AddJwtBearer(options =>
